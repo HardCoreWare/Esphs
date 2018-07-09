@@ -1,3 +1,7 @@
+#if (ARDUINO >= 100)
+#include <Arduino.h>
+#else
+#include <WProgram.h>
 #endif
 
 #include "Esphs.h"
@@ -8,51 +12,17 @@ Esp::Esp(){
 
 //----------------------------------------------------------------------------------------------------------------------
 
-boolean Esp::reset(){
+void Esp::reset(){
 
     Serial3.println("AT+RST");
-    
-    while(!Serial3.available()){ }
-
-    if(Serial3.find("OK") ) {
-    	
-        Serial3.flush();
-        
-        return true;
-
-    }
-
-    else{
-
-        return false;
-  
-    }
   
 }
 
 //----------------------------------------------------------------------------------------------
 
-boolean Esp::setMode(int m){
+void Esp::setMode(int m){
 
     Serial3.println("AT+CWMODE="+String(m,DEC));
-
-    while(!Serial3.available()){ }
-
-    if(Serial3.find("OK") ) {
-    	
-        Serial3.flush();
-        
-        mode=m;
-
-        return true;
-
-    }
-
-    else{
-
-        return false;
-  
-    }
     
 }
 
@@ -82,127 +52,109 @@ void Esp::espNode(){
 
 //-------------------------------------------------------------------------------------------------------------------------------
 
-boolean Esp::setAP(String n, String p, int c, int e){
+void Esp::setAP(String n, String p, int c, int e){
 
     Serial3.println("AT+CWSAP="+n+","+p+","+String(c,DEC)+","+String(e,DEC));
-
-    while(!Serial3.available()){ }
-    
-    if(Serial3.find("OK") ) {
-      
-        Serial3.flush();
-        ap.name=n;
-        ap.password=p;
-        ap.channel=c;
-        ap.encrypt=e;
-        
-        return true;
-
-    }
-
-    else{
-
-        return false;
-  
-    }
     
 }
 
 //-----------------------------------------------------------------------------------------------------------------
 
-boolean Esp::setClient(String n, String p){
+void Esp::setClient(String n, String p){
 
 char c='"';
 
     Serial3.println("AT+JWSAP="+String(c)+n+String(c)+","+String(c)+p+String(c));
-
-    while(!Serial3.available()){ }
-    
-    if(Serial3.find("OK") ) {
-      
-        Serial3.flush();
-        client.name=n;
-        client.password=p;
-        
-        return true;
-
-    }
-
-    else{
-
-        return false;
-
-    }
     
 }
 
-//-----------------------------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------------------
 
-int Esp::getMode(){
-
-return mode;
-
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-
-boolean Esp::multiCon(int m){
+void Esp::multiCon(int m){
 	
 	
     Serial.println("AT+CIPMUX="+String(m));
     
-	while(!Serial3.available()){ }
-    
-    if(Serial3.find("OK")){
-	
-        Serial3.flush();
-        
-	    return true;
-
-    }
-    
-    else {
-    	
-    	Serial3.flush();
-    	
-    	return false;
-    	
-	}
 		
 }
 
 //----------------------------------------------------------------------------------------------------------------------------
 
-boolean Esp::httpBegin(String t, String h, int p){
+void Esp::httpBegin(String t, String h, int p){
 
     char c ='"';
 	
-	Serial.println("AT+CIPSTART="+String(c)+t+String(c)+","+String(c)+h+String(c)+","+String(p));
-    
-	while(!Serial3.available()){ }
+	Serial3.println("AT+CIPSTART="+String(c)+t+String(c)+","+String(c)+h+String(c)+","+String(p));
 	
-	if(Serial3.find("OK")){
-		
-		return true;
-		
-	}
-	
-	else{
-	
-	    return false; 
-	
-	}
 	
 }
 
 //---------------------------------------------------------------------------------------------------------------------------------------
 
-boolean Esp::httpSend(){
+void Esp::httpSet(int l){
 	
-return true;
+Serial3.println("AT+CIPSEND="+String(l,DEC));
 	
 }
+
+String Esp::POST(String host, String url, String data){
+
+String req =  "POST " + url + " HTTP/1.0"+"\r\n"+
+
+"Host: " + host + "\r\n" +
+
+"Accept: *" + "/" + "*" + "\r\n" +
+
+"Content-Length: " + String(data.length()) + "\r\n" +
+
+"Content-Type: application/x-www-form-urlencoded" + "\r\n" + "\r\n" 
+
++ data; 
+
+return req;
+
+}
+
+//----------------------------------------------------------------------------------------------------------------------------
+
+void Esp::httpEnd(){
 	
+	Serial3.println("AT+CIPCLOSE");
+	
+	
+}
+
+//----------------------------------------------------------------------------------------------------------------------------
+
+void Esp::httpSend(String req){
+	
+	Serial3.println(req);
+	
+	
+}
+
+String Esp::GET(String host, String url, String data){
+
+String req =  "GET " + url + " HTTP/1.0"+"\r\n"+
+
+"Host: " + host + "\r\n" +
+
+"Accept: *" + "/" + "*" + "\r\n" +
+
+"Content-Length: " + String(data.length()) + "\r\n" +
+
+"Content-Type: application/x-www-form-urlencoded" + "\r\n" + "\r\n" 
+
++ data; 
+
+return req;
+
+}
+	
+
+
+
+
 
 
 
