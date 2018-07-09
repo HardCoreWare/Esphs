@@ -14,14 +14,20 @@ class Esp{
 
         Esp();
         void espNode();
-        boolean reset();
-        boolean setMode(int m);
-        boolean setAP(String n, String p, int c, int e);     
-        boolean setClient(String n, String p);
+        void reset();
+        void setMode(int m);
+        void setAP(String n, String p, int c, int e);     
+        void setClient(String n, String p);
         int getMode();
-        boolean multiCon(int m);
-        boolean httpBegin(String t, String h, int p);
-        boolean httpSend();
+        void multiCon(int m);
+        void httpBegin(String t, String h, int p);
+        void httpEnd();
+        void httpSet(int l);
+        void httpSend(String req);
+        
+        String POST(String host, String url, String data);
+        String GET(String host, String url, String data);
+
      
     private:
     	
@@ -39,5 +45,6 @@ class Esp{
         }ap,client;
 
 };
+
 
 #endif
